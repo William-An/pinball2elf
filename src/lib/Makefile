@@ -20,6 +20,8 @@ ifneq ($(PINCRT),)
 CFLAGS += -DPINCRT
 endif
 
+CFLAGS += -march=nocona -mno-sse3
+
 
 LIBCLE=libcle.a
 LIBPERFLE=libperfle.a
