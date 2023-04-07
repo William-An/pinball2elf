@@ -93,6 +93,9 @@ LIBCLE = $(LIBLE_PATH)/libcle.a
 CXXFLAGS += $(IOPT). 
 CCFLAGS  += $(IOPT).
 
+CXXFLAGS += -march=nocona -mno-sse3
+CCFLAGS += -march=nocona -mno-sse3
+
 CXX_COMPILE_OPT = $(CXX) $(COPT) $(CXXFLAGS) $(CXXFLAGS_OPT)
 CC_COMPILE_OPT  = $(CC) $(COPT) $(CCFLAGS) $(CCFLAGS_OPT)
 CXX_LINK_OPT    = $(CXX_LINKER) $(LDFLAGS) $(LDFLAGS_OPT)

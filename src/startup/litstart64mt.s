@@ -288,7 +288,8 @@ pbs.init_thread:
 .endif
     mov       $0x03,%eax               # xfeatures_lo_dword mask
     mov       $0x00,%edx               # xfeatures_hi_dword mask
-    xrstor    (%rsp)
+    #xrstor    (%rsp)
+    fxrstor    (%rsp)
     add       $state.fs_desc_offs,%rsp
     mov       $0x9a,%eax
     mov       $0x1,%edi

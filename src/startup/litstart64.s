@@ -21,7 +21,8 @@ _start:
     movabs   $cpu_state,%rsp
     mov      $0x03,%eax               # xfeatures_lo_dword mask
     mov      $0x00,%edx               # xfeatures_hi_dword mask
-    xrstor   (%rsp)
+    #xrstor   (%rsp)
+    fxrstor   (%rsp)
     add      $state.fs_desc_offs,%rsp
     mov      $0x9a,%rax
     mov      $0x1,%rdi
