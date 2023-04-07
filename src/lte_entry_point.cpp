@@ -26,7 +26,8 @@ END_LEGAL */
 #endif
 
 const lte_uint8_t FXRSTOR_OPCODE = 0x0c;
-const lte_uint8_t XRSTOR_OPCODE = 0x2c;
+//const lte_uint8_t XRSTOR_OPCODE = 0x2c;
+const lte_uint8_t XRSTOR_OPCODE = 0x0c;
 
 #define ENTRY_POINT_DECLARATION_BEGIN(name) \
    struct name { union {
@@ -218,7 +219,8 @@ static lte_uint8_t s_entry64[] = {
  /*1be*/ 0x4d, 0x89, 0xe5,                              //mov    %r12,%r13
  /*1c1*/ 0xb8, 0x03, 0x00, 0x00, 0x00,                  //mov    $0x3,%eax
  /*1c6*/ 0xba, 0x00, 0x00, 0x00, 0x00,                  //mov    $0x0,%edx
- /*1cb*/ 0x0f, 0xae, 0x2c, 0x24,                        //xrstor (%rsp)
+ /*1cb*/ /*0x0f, 0xae, 0x2c, 0x24, */                       //xrstor (%rsp)
+ /*1cb*/ 0x0f, 0xae, 0x0c, 0x24,                        //fxrstor (%rsp)
  /*1cf*/ 0x48, 0x81, 0xc4, 0xf0, 0x0a, 0x00, 0x00,      //add    $0xaf0,%rsp
  /*1d6*/ 0xb8, 0x9a, 0x00, 0x00, 0x00,                  //mov    $0x9a,%eax
  /*1db*/ 0xbf, 0x01, 0x00, 0x00, 0x00,                  //mov    $0x1,%edi
