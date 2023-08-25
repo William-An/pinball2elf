@@ -359,10 +359,15 @@ static lte_uint8_t s_entry64[] = {
  /*361*/ 0x9d,                                          //popfq
  /*362*/ 0xc3,                                          //retq
 //<pbs.tst.start>:
- /*363*/ 0x0f, 0x04, 0x21, 0x00,                        //m5_exit
- /*367*/ 0x5c,                                          //pop    %rsp
- /*368*/ 0xff, 0x25, 0x00, 0x00, 0x00, 0x00,            //jmpq   *0x0(%rip)
- /*36e*/ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
+ /*363*/ 0x50,                                          //push    %rax
+ /*364*/ 0x57,                                          //push    %rdi
+ /*365*/ 0x31, 0xff,                                    //xor     %edi, %edi
+ /*367*/ 0x0f, 0x04, 0x21, 0x00,                        //m5_exit
+ /*36b*/ 0x5f,                                          //pop     %rdi
+ /*36c*/ 0x58,                                          //pop     %rax
+ /*36d*/ 0x5c,                                          //pop    %rsp
+ /*36e*/ 0xff, 0x25, 0x00, 0x00, 0x00, 0x00,            //jmpq   *0x0(%rip)
+ /*374*/ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
 typedef enum {
@@ -415,7 +420,7 @@ typedef enum {
    E64_SIM_ROI_TAG_SSC_OFFS    = 0x34f,
    E64_SIM_ROI_TAG_SIMICS_OFFS = 0x357,
    E64_THREAD_ENTRY_TABLE_OFFS = 0x363,
-   E64_THREAD_START_ADDR_OFFS  = 0x36e, // thread start address#endif
+   E64_THREAD_START_ADDR_OFFS  = 0x374, // thread start address#endif
    E64_SIZE                    = sizeof(s_entry64),
    E64_ON_PSTART_SIZE          = E64_ON_PEXIT_OFFS-E64_ON_PSTART_OFFS,
    E64_ON_PEXIT_SIZE           = E64_ON_TSTART_OFFS-E64_ON_PEXIT_OFFS,
