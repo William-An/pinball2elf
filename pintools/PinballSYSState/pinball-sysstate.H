@@ -813,6 +813,7 @@ class SYSSTATE_PRODUCER
                   // this _file_pos has not had a 'real' write yet, add an empty one
                   UINT32 count_written = write(dummy_fileFD, (*rit)->_shadow_buf, (*rit)->_count_req);
                   //cerr << " writing an empty buffer at pos " << dec << (*rit)->_file_pos << endl;
+                  cerr << " writing " << (*rit)->_count_req << " bytes, written " << count_written << " bytes" << endl;
                   ASSERTX(count_written == (*rit)->_count_req);
                 }
               }
