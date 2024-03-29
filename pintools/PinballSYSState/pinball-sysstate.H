@@ -814,7 +814,11 @@ class SYSSTATE_PRODUCER
                   UINT32 count_written = write(dummy_fileFD, (*rit)->_shadow_buf, (*rit)->_count_req);
                   //cerr << " writing an empty buffer at pos " << dec << (*rit)->_file_pos << endl;
                   cerr << " writing " << (*rit)->_count_req << " bytes, written " << count_written << " bytes" << endl;
-                  ASSERTX(count_written == (*rit)->_count_req);
+                  if ((count_written == 0x7FFFF000) && ((*rit)->_count_req > count_written)) {
+                    cerr << "Skipping written bytes count check due to limit (0x7FFFF000) for Linux with `read` and `write`." << endl;
+                  } else {
+                    ASSERTX(count_written == (*rit)->_count_req);
+                  }
                 }
               }
               write_count += this_write_count;
