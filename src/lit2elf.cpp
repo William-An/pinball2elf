@@ -146,7 +146,7 @@ static lte_addr_t litelfMarkDynallocPages(lte_memimg_t& memimg, lte_x86_arch_sta
                // Fill placeholder pages
                while (diff/LTE_PAGE_SIZE > 0) {
                   // Use placeholder for this
-                  pages[pg->va] = pg;
+                  pages[pg->va - diff] = pg;
                   diff -= LTE_PAGE_SIZE;
                }
             }
