@@ -791,7 +791,7 @@ int main(int argc, char** argv)
 
    if(!get_config().no_startup_code())
    {
-      remap_va = litelfMarkDynallocPages(img, arch_state, dynpages);
+      // remap_va = litelfMarkDynallocPages(img, arch_state, dynpages);
 
       entry = entry_point_t::create_entry_point(arch_state.get_arch(), arch_state.get_threads_num());
       if(entry)
@@ -850,10 +850,11 @@ int main(int argc, char** argv)
    lte_uint64_t regions_num = img.compact(regions_num_max);
 
    // Update page count in startup code after compaction
-   // if(!get_config().no_startup_code()) {
-   //    remap_va = litelfMarkDynallocPages(img, arch_state, dynpages);
-   //    entry->setup(arch_state.get_threads_num(), &arch_state.get_thread_state(0), dynpages.table_ptr(), dynpages.count());
-   // }
+   if(!get_config().no_startup_code()) {
+      remap_va = litelfMarkDynallocPages(img, arch_state, dynpages);
+      entry->setup(arch_state.get_threads_num(), &arch_state.get_thread_state(0), dynpages.table_ptr(), dynpages.count());
+      printf("After compaction dynpages count: %lld\n", dynpages.count());
+   }
 
    symtab = elf->create_symtab();
    // size of symtab: number of startup symbols + number of memory regions + 1 (.comment section)
