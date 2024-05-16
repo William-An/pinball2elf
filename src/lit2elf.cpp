@@ -801,7 +801,7 @@ int main(int argc, char** argv)
     * and .comment sections, the maximal number of sections containing memory
     * image data should be less than (elf->get_max_phnum() - 8)
    */
-   lte_uint64_t regions_num_max = elf->get_max_phnum() - 64;
+   lte_uint64_t regions_num_max = elf->get_max_phnum() - 128;
    lte_uint64_t regions_num = img.compact(regions_num_max);
    printf("main: region num: %lld region max: %lld\n", regions_num, regions_num_max);
 
