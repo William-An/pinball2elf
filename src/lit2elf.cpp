@@ -126,13 +126,41 @@ static lte_addr_t litelfMarkDynallocPages(lte_memimg_t& memimg, lte_x86_arch_sta
 
    if(remap_limit < (LTE_MAXVAL(lte_addr_t)-memimg.page_size))
    {
-      for(lte_memimg_t::iterator it = memimg.begin(); it != memimg.end(); ++it)
-      {
-         if(((it->first + memimg.page_size) > remap_limit) && (pages.count(it->first) == 0))
-         {
-            it->second.flags |= SHF_DYNALLOC;
-            pages[it->first] = &it->second;
-         }
+      // for(lte_memimg_t::iterator it = memimg.begin(); it != memimg.end(); ++it)
+      // {
+      //    if(((it->first + memimg.page_size) > remap_limit) && (pages.count(it->first) == 0))
+      //    {
+      //       it->second.flags |= SHF_DYNALLOC;
+      //       pages[it->first] = &it->second;
+      //    }
+      // }
+      // Add the region to dynpages
+      // Need to fill the gap if two pages in same region are not consecutive
+      for(lte_mempage_t *region = memimg.get_first_page(); region; region = region->region_next) {
+         lte_mempage_t *pg_prev = NULL;
+         lte_mempage_t *pg = region;
+         do {
+            // Check if two pages are not adjacent
+            lte_addr_t diff = pg->va - pg_prev->va;
+            if (pg_prev && (diff != LTE_PAGE_SIZE)) {
+               // Fill placeholder pages
+               while (diff/LTE_PAGE_SIZE > 0) {
+                  // Use placeholder for this
+                  pages[pg->va] = pg;
+                  diff -= LTE_PAGE_SIZE;
+               }
+            }
+
+            // Add pages to dynpages
+            if(((pg->va + memimg.page_size) > remap_limit) && (pages.count(pg->va) == 0)) {
+               pg->flags |= SHF_DYNALLOC;
+               pages[pg->va] = pg;
+            }
+
+            // Preceed to next page in the same region
+            pg_prev = pg;
+            pg = (lte_mempage_t *)pg->next;
+         } while(pg);
       }
    }
 
@@ -763,7 +791,7 @@ int main(int argc, char** argv)
 
    if(!get_config().no_startup_code())
    {
-      remap_va = litelfMarkDynallocPages(img, arch_state, dynpages);
+      // remap_va = litelfMarkDynallocPages(img, arch_state, dynpages);
 
       entry = entry_point_t::create_entry_point(arch_state.get_arch(), arch_state.get_threads_num());
       if(entry)
@@ -820,6 +848,12 @@ int main(int argc, char** argv)
    */
    lte_uint64_t regions_num_max = elf->get_max_phnum() - 8;
    lte_uint64_t regions_num = img.compact(regions_num_max);
+
+   // Update page count in startup code after compaction
+   if(!get_config().no_startup_code()) {
+      remap_va = litelfMarkDynallocPages(img, arch_state, dynpages);
+      entry->setup(arch_state.get_threads_num(), &arch_state.get_thread_state(0), dynpages.table_ptr(), dynpages.count());
+   }
 
    symtab = elf->create_symtab();
    // size of symtab: number of startup symbols + number of memory regions + 1 (.comment section)
