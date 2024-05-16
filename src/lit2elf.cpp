@@ -141,8 +141,8 @@ static lte_addr_t litelfMarkDynallocPages(lte_memimg_t& memimg, lte_x86_arch_sta
          lte_mempage_t *pg = region;
          do {
             // Check if two pages are not adjacent
-            lte_addr_t diff = pg->va - pg_prev->va;
-            if (pg_prev && (diff != LTE_PAGE_SIZE)) {
+            if (pg_prev && (pg->va - pg_prev->va != LTE_PAGE_SIZE)) {
+               lte_addr_t diff = pg->va - pg_prev->va;
                // Fill placeholder pages
                while (diff/LTE_PAGE_SIZE > 0) {
                   // Use placeholder for this
