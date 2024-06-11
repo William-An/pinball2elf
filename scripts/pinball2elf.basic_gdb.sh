@@ -1,7 +1,7 @@
 #!/bin/bash
 myloc=`dirname $0`
 export PINBALL2ELFLOC=`dirname $myloc`/src
-export PINBALL2ELF=$PINBALL2ELFLOC"/pinball2elf"
+export PINBALL2ELF=$PINBALL2ELFLOC"/pinball2elfd"
 export INST=`dirname $myloc`/instrumentation
 ulimit -s unlimited
 
