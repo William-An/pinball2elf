@@ -789,22 +789,6 @@ int main(int argc, char** argv)
       return 1;
    }
 
-   /**
-    * Linux has a limit on a number of segments inside an application image
-    * [NB: the limit is on a TOTAL number of segments, not only LOADable ones]
-    *
-    * Hence, we start by coalescing contiguous sections to remove redundant
-    * segmentation and continue by coalescing discontiguous sections by means
-    * of INT3-filled spacers until this constraint is fulfilled.
-    *
-    * As we also will create NULL, .text, .data, .shstrtab, .strtab, .symtab
-    * and .comment sections, the maximal number of sections containing memory
-    * image data should be less than (elf->get_max_phnum() - 8)
-   */
-   lte_uint64_t regions_num_max = elf->get_max_phnum() - 8;
-   lte_uint64_t regions_num = img.compact(regions_num_max);
-   printf("main: region num: %lld region max: %lld\n", regions_num, regions_num_max);
-
    if(!get_config().no_startup_code())
    {
       remap_va = litelfMarkDynallocPages(img, arch_state, dynpages);
@@ -851,8 +835,31 @@ int main(int argc, char** argv)
    }
 
    printf("main: after entrypoint dynpage count: %lld\n", dynpages.count());
+
+   /**
+    * Linux has a limit on a number of segments inside an application image
+    * [NB: the limit is on a TOTAL number of segments, not only LOADable ones]
+    *
+    * Hence, we start by coalescing contiguous sections to remove redundant
+    * segmentation and continue by coalescing discontiguous sections by means
+    * of INT3-filled spacers until this constraint is fulfilled.
+    *
+    * As we also will create NULL, .text, .data, .shstrtab, .strtab, .symtab
+    * and .comment sections, the maximal number of sections containing memory
+    * image data should be less than (elf->get_max_phnum() - 8)
+   */
+   lte_uint64_t regions_num_max = elf->get_max_phnum() - 8;
+   lte_uint64_t regions_num = img.compact(regions_num_max);
+   printf("main: region num: %lld region max: %lld\n", regions_num, regions_num_max);
+
    // regions_num = img.compact();
    // printf("main: after entrypoint region num: %lld region max: %lld\n", regions_num, regions_num_max);
+
+   // Do dynpage again after compaction
+   elf_table_t new_dynpages;
+   remap_va = litelfMarkDynallocPages(img, arch_state, new_dynpages);
+   ((entry_point64_t *)entry)->resize_dmap_pages(new_dynpages.table_ptr(), new_dynpages.count());
+   printf("main: after compaction dynpage count: %lld\n", new_dynpages.count());
 
    symtab = elf->create_symtab();
    // size of symtab: number of startup symbols + number of memory regions + 1 (.comment section)
