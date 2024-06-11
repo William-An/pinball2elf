@@ -801,7 +801,7 @@ int main(int argc, char** argv)
     * and .comment sections, the maximal number of sections containing memory
     * image data should be less than (elf->get_max_phnum() - 8)
    */
-   lte_uint64_t regions_num_max = elf->get_max_phnum() - 128;
+   lte_uint64_t regions_num_max = elf->get_max_phnum() - 8;
    lte_uint64_t regions_num = img.compact(regions_num_max);
    printf("main: region num: %lld region max: %lld\n", regions_num, regions_num_max);
 
@@ -850,8 +850,9 @@ int main(int argc, char** argv)
       entry_data_va = 0;
    }
 
-   regions_num = img.compact();
-   printf("main: after entrypoint region num: %lld region max: %lld\n", regions_num, regions_num_max);
+   printf("main: after entrypoint dynpage count: %lld\n", dynpages.count());
+   // regions_num = img.compact();
+   // printf("main: after entrypoint region num: %lld region max: %lld\n", regions_num, regions_num_max);
 
    symtab = elf->create_symtab();
    // size of symtab: number of startup symbols + number of memory regions + 1 (.comment section)
