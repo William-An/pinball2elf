@@ -807,22 +807,6 @@ int main(int argc, char** argv)
 
          entry_data_va = img.insert(NULL, entry->get_data_size(), SHF_DATA|SHF_ENTRYPOINT);
          LTE_ERRAX(!entry_data_va, "no space for entry point data");
-
-         entry->relocate_code(entry_va); // should be before copying to image
-         entry->relocate_data(entry_data_va); // should be before copying to image
-
-         elf->set_e_entry(entry->get_start_va()); // address of _start symbol
-
-         entry->set_proc_start_callback(get_config().get_process_cbk_name());
-         entry->set_proc_exit_callback(get_config().get_process_exit_cbk_name());
-         entry->set_thread_start_callback(get_config().get_thread_cbk_name());
-         entry->set_callback_stack_size(get_config().get_cbk_stack_size());
-
-         entry->set_start_roi_mark(get_config().get_roi_start_tag(ROI_TYPE_SNIPER), ROI_TYPE_SNIPER);
-         entry->set_start_roi_mark(get_config().get_roi_start_tag(ROI_TYPE_SSC), ROI_TYPE_SSC);
-         entry->set_start_roi_mark(get_config().get_roi_start_tag(ROI_TYPE_SIMICS), ROI_TYPE_SIMICS);
-         entry->set_magic2_tag(get_config().get_magic2_tag(ROI_TYPE_SIMICS), ROI_TYPE_SIMICS);
-         entry->set_roi_mark_thread(get_config().get_roi_thread_id());
       }
       else
       {
@@ -862,6 +846,26 @@ int main(int argc, char** argv)
    remap_va = litelfMarkDynallocPages(img, arch_state, new_dynpages);
    ((entry_point64_t *)entry)->resize_dmap_pages(new_dynpages.table_ptr(), new_dynpages.count(), dynpages.count(), entry_data_va);
    printf("main: after compaction dynpage count: %lld\n", new_dynpages.count());
+
+   // Move entry code positioning logic here
+   if(!get_config().no_startup_code())
+   {
+      entry->relocate_code(entry_va); // should be before copying to image
+      entry->relocate_data(entry_data_va); // should be before copying to image
+
+      elf->set_e_entry(entry->get_start_va()); // address of _start symbol
+
+      entry->set_proc_start_callback(get_config().get_process_cbk_name());
+      entry->set_proc_exit_callback(get_config().get_process_exit_cbk_name());
+      entry->set_thread_start_callback(get_config().get_thread_cbk_name());
+      entry->set_callback_stack_size(get_config().get_cbk_stack_size());
+
+      entry->set_start_roi_mark(get_config().get_roi_start_tag(ROI_TYPE_SNIPER), ROI_TYPE_SNIPER);
+      entry->set_start_roi_mark(get_config().get_roi_start_tag(ROI_TYPE_SSC), ROI_TYPE_SSC);
+      entry->set_start_roi_mark(get_config().get_roi_start_tag(ROI_TYPE_SIMICS), ROI_TYPE_SIMICS);
+      entry->set_magic2_tag(get_config().get_magic2_tag(ROI_TYPE_SIMICS), ROI_TYPE_SIMICS);
+      entry->set_roi_mark_thread(get_config().get_roi_thread_id());
+   }
 
    symtab = elf->create_symtab();
    // size of symtab: number of startup symbols + number of memory regions + 1 (.comment section)
