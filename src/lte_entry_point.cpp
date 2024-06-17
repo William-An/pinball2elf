@@ -1074,7 +1074,7 @@ void entry_point64_t::resize_dmap_pages(void* new_dmap_pages, lte_uint32_t new_d
 
    e->dmap_pages_num = new_dmap_pages_num;
    m_dmap_pages_num = new_dmap_pages_num;
-   update(new_dmap_pages, new_dmap_pages_num * 4, "dmap.pages", E32_LOBJECT);
+   update(new_dmap_pages, new_dmap_pages_num * 8, "dmap.pages", E32_LOBJECT);
 }
 
 void entry_point64_t::setup(lte_uint32_t threads_num, lte_thread_state_t* states, void* dmap_pages, lte_uint32_t dmap_pages_num)
