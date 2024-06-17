@@ -170,7 +170,7 @@ static lte_addr_t litelfMarkDynallocPages(lte_memimg_t& memimg, lte_x86_arch_sta
    {
       lte_uint64_t va = it->second->va;
       dynpages.push_back(&va, va_size);
-      printf("\tDYNPages: Addr: %x\n", va);
+      printf("\tDYNPages: Addr: %llx\n", va);
    }
 
    return pages.size() ? pages.begin()->first : LTE_MAXVAL(lte_addr_t);
