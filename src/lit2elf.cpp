@@ -126,13 +126,41 @@ static lte_addr_t litelfMarkDynallocPages(lte_memimg_t& memimg, lte_x86_arch_sta
 
    if(remap_limit < (LTE_MAXVAL(lte_addr_t)-memimg.page_size))
    {
-      for(lte_memimg_t::iterator it = memimg.begin(); it != memimg.end(); ++it)
-      {
-         if(((it->first + memimg.page_size) > remap_limit) && (pages.count(it->first) == 0))
-         {
-            it->second.flags |= SHF_DYNALLOC;
-            pages[it->first] = &it->second;
-         }
+      // for(lte_memimg_t::iterator it = memimg.begin(); it != memimg.end(); ++it)
+      // {
+      //    if(((it->first + memimg.page_size) > remap_limit) && (pages.count(it->first) == 0))
+      //    {
+      //       it->second.flags |= SHF_DYNALLOC;
+      //       pages[it->first] = &it->second;
+      //    }
+      // }
+      // Add the region to dynpages
+      // Need to fill the gap if two pages in same region are not consecutive
+      for(lte_mempage_t *region = memimg.get_first_page(); region; region = region->region_next) {
+         lte_mempage_t *pg_prev = NULL;
+         lte_mempage_t *pg = region;
+         do {
+            // Check if two pages are not adjacent
+            if (pg_prev && (pg->va - pg_prev->va > LTE_PAGE_SIZE)) {
+               lte_addr_t offset = pg->va - pg_prev->va - LTE_PAGE_SIZE;
+               // Fill placeholder pages
+               while (offset/LTE_PAGE_SIZE > 0) {
+                  // Use placeholder for this
+                  pages[pg_prev->va + offset] = pg;
+                  offset -= LTE_PAGE_SIZE;
+               }
+            }
+
+            // Add pages to dynpages
+            if(((pg->va + memimg.page_size) > remap_limit) && (pages.count(pg->va) == 0)) {
+               pg->flags |= SHF_DYNALLOC;
+               pages[pg->va] = pg;
+            }
+
+            // Preceed to next page in the same region
+            pg_prev = pg;
+            pg = (lte_mempage_t *)pg->next;
+         } while(pg);
       }
    }
 
@@ -808,6 +836,8 @@ int main(int argc, char** argv)
       entry_data_va = 0;
    }
 
+   printf("main: after entrypoint dynpage count: %lld\n", dynpages.count());
+
    /**
     * Linux has a limit on a number of segments inside an application image
     * [NB: the limit is on a TOTAL number of segments, not only LOADable ones]
@@ -822,6 +852,16 @@ int main(int argc, char** argv)
    */
    lte_uint64_t regions_num_max = elf->get_max_phnum() - 8;
    lte_uint64_t regions_num = img.compact(regions_num_max);
+   printf("main: region num: %lld region max: %lld\n", regions_num, regions_num_max);
+
+   // regions_num = img.compact();
+   // printf("main: after entrypoint region num: %lld region max: %lld\n", regions_num, regions_num_max);
+
+   // Do dynpage again after compaction
+   elf_table_t new_dynpages;
+   remap_va = litelfMarkDynallocPages(img, arch_state, new_dynpages);
+   ((entry_point64_t *)entry)->resize_dmap_pages(new_dynpages.table_ptr(), new_dynpages.count());
+   printf("main: after compaction dynpage count: %lld\n", new_dynpages.count());
 
    symtab = elf->create_symtab();
    // size of symtab: number of startup symbols + number of memory regions + 1 (.comment section)
