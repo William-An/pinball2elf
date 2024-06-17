@@ -1079,7 +1079,9 @@ entry_point64_t::~entry_point64_t()
 void entry_point64_t::resize_dmap_pages(void* new_dmap_pages, lte_uint32_t new_dmap_pages_num, lte_uint32_t old_dmap_pages_num) {
    entry64_t* e = (entry64_t*)m_entry;
 
-   m_dmap_offs = m_state.table_size();
+   // Since update will pop_back the old_dmap_pages entry, we will need to
+   // adjust the offset
+   m_dmap_offs = m_state.table_size() - old_dmap_pages_num * 8;
 
    // Update page number and page table pointer
    update(new_dmap_pages, new_dmap_pages_num * 8, old_dmap_pages_num * 8, "dmap.pages", E32_LOBJECT);
