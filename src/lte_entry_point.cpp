@@ -729,14 +729,12 @@ void entry_point_t::add(lte_uint32_t tid, const void* sym_data, lte_size_t sym_d
    add(sym_data, sym_data_size, buffer, sym_info);
 }
 
-void entry_point_t::update(const void* sym_data, lte_size_t sym_data_size, lte_size_t old_sym_data_size, const char* sym_name, unsigned char sym_info)
+void entry_point_t::update(const void* sym_data, lte_size_t sym_data_size, const char* sym_name, unsigned char sym_info)
 {
    sym s;
 
    s.name = strdup(sym_name);
    s.offs = m_state.table_size();
-   // First pop back data
-   m_state.pop_back(old_sym_data_size);
    m_state.push_back(sym_data, sym_data_size);
    s.size = m_state.table_size() - s.offs;
    s.info = sym_info;
@@ -1078,13 +1076,13 @@ entry_point64_t::~entry_point64_t()
 
 void entry_point64_t::resize_dmap_pages(void* new_dmap_pages, lte_uint32_t new_dmap_pages_num, lte_uint32_t old_dmap_pages_num) {
    entry64_t* e = (entry64_t*)m_entry;
+   // First pop back old dmap data
+   m_state.pop_back(old_dmap_pages_num * 8);
 
-   // Since update will pop_back the old_dmap_pages entry, we will need to
-   // adjust the offset
-   m_dmap_offs = m_state.table_size() - old_dmap_pages_num * 8;
+   m_dmap_offs = m_state.table_size();
 
    // Update page number and page table pointer
-   update(new_dmap_pages, new_dmap_pages_num * 8, old_dmap_pages_num * 8, "dmap.pages", E32_LOBJECT);
+   update(new_dmap_pages, new_dmap_pages_num * 8, "dmap.pages", E32_LOBJECT);
 
    // Setting the entry64_t fields
    // Which is the hardcoded startup code in elfie
