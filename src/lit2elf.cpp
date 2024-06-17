@@ -72,11 +72,6 @@ static lte_addr_t litelfMarkDynallocPages(lte_memimg_t& memimg, lte_x86_arch_sta
       {
          lte_mempage_t* pg_rsp = memimg.get_page(arch_state.get_thread_state(i).gprstate.rsp);
 
-         // Skip elfie entry code when remapping
-         if (pg_rsp->flags & SHF_ENTRYPOINT) {
-            continue;
-         }
-
          if(pg_rsp)
          {
             lte_addr_t stack_start;
@@ -144,6 +139,12 @@ static lte_addr_t litelfMarkDynallocPages(lte_memimg_t& memimg, lte_x86_arch_sta
       for(lte_mempage_t *region = memimg.get_first_page(); region; region = region->region_next) {
          lte_mempage_t *pg_prev = NULL;
          lte_mempage_t *pg = region;
+         
+         // Skip elfie entry code when remapping
+         if (pg->flags & SHF_ENTRYPOINT) {
+            continue;
+         }
+         
          do {
             // Check if two pages are not adjacent
             if (pg_prev && (pg->va - pg_prev->va > LTE_PAGE_SIZE)) {
