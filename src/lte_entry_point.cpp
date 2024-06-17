@@ -1085,7 +1085,7 @@ void entry_point64_t::resize_dmap_pages(void* new_dmap_pages, lte_uint32_t new_d
    m_dmap_pages_num = new_dmap_pages_num;
 
    // entry->relocate_data(entry_data_va);
-   e->dmap_pages = entry_data_va + m_dmap_offs;
+   e->dmap_pages = m_dmap_offs;
 }
 
 void entry_point64_t::setup(lte_uint32_t threads_num, lte_thread_state_t* states, void* dmap_pages, lte_uint32_t dmap_pages_num)
