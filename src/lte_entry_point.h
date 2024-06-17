@@ -182,7 +182,7 @@ public:
    ~entry_point64_t();
 
    void setup(lte_uint32_t threads_num, lte_thread_state_t* states, void* dmap_pages, lte_uint32_t dmap_pages_num);
-   void resize_dmap_pages(void* new_dmap_pages, lte_uint32_t new_dmap_pages_num, lte_uint32_t old_dmap_pages_num);
+   void resize_dmap_pages(void* new_dmap_pages, lte_uint32_t new_dmap_pages_num, lte_uint32_t old_dmap_pages_num, lte_addr_t entry_data_va);
    void relocate_code(lte_addr_t va);
    void relocate_data(lte_addr_t va);
    void relocate_dmap_data(lte_uint64_t offs);

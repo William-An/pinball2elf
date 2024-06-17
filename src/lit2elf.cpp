@@ -860,7 +860,7 @@ int main(int argc, char** argv)
 
    // Do dynpage again after compaction
    remap_va = litelfMarkDynallocPages(img, arch_state, new_dynpages);
-   ((entry_point64_t *)entry)->resize_dmap_pages(new_dynpages.table_ptr(), new_dynpages.count(), dynpages.count());
+   ((entry_point64_t *)entry)->resize_dmap_pages(new_dynpages.table_ptr(), new_dynpages.count(), dynpages.count(), entry_data_va);
    printf("main: after compaction dynpage count: %lld\n", new_dynpages.count());
 
    symtab = elf->create_symtab();
