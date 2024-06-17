@@ -66,7 +66,7 @@ protected:
    template<typename T> void add(lte_uint32_t tid, const T& sym_data, const char* sym_name, unsigned char sym_info);
    void add(lte_uint32_t tid, const void* sym_data, lte_size_t sym_data_size, const char* sym_name, unsigned char sym_info);
    void add(const void* sym_data, lte_size_t sym_data_size, const char* sym_name, unsigned char sym_info);
-   void update(const void* sym_data, lte_size_t sym_data_size, const char* sym_name, unsigned char sym_info);
+   void update(const void* sym_data, lte_size_t sym_data_size, lte_size_t old_sym_data_size, const char* sym_name, unsigned char sym_info);
    void add_padding(lte_size_t size, int c = 0) { m_state.push_back(c, size); }
 
    void clear_initial_state();
@@ -182,7 +182,7 @@ public:
    ~entry_point64_t();
 
    void setup(lte_uint32_t threads_num, lte_thread_state_t* states, void* dmap_pages, lte_uint32_t dmap_pages_num);
-   void resize_dmap_pages(void* new_dmap_pages, lte_uint32_t new_dmap_pages_num);
+   void resize_dmap_pages(void* new_dmap_pages, lte_uint32_t new_dmap_pages_num, lte_uint32_t old_dmap_pages_num);
    void relocate_code(lte_addr_t va);
    void relocate_data(lte_addr_t va);
    void relocate_dmap_data(lte_uint64_t offs);

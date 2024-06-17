@@ -859,9 +859,9 @@ int main(int argc, char** argv)
    // printf("main: after entrypoint region num: %lld region max: %lld\n", regions_num, regions_num_max);
 
    // Do dynpage again after compaction
-   remap_va = litelfMarkDynallocPages(img, arch_state, dynpages);
-   ((entry_point64_t *)entry)->resize_dmap_pages(dynpages.table_ptr(), dynpages.count());
-   printf("main: after compaction dynpage count: %lld\n", dynpages.count());
+   remap_va = litelfMarkDynallocPages(img, arch_state, new_dynpages);
+   ((entry_point64_t *)entry)->resize_dmap_pages(new_dynpages.table_ptr(), new_dynpages.count(), dynpages.count());
+   printf("main: after compaction dynpage count: %lld\n", new_dynpages.count());
 
    symtab = elf->create_symtab();
    // size of symtab: number of startup symbols + number of memory regions + 1 (.comment section)
