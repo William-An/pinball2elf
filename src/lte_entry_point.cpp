@@ -1071,7 +1071,7 @@ entry_point64_t::~entry_point64_t()
 void entry_point64_t::resize_dmap_pages(void* new_dmap_pages, lte_uint32_t new_dmap_pages_num, lte_uint32_t old_dmap_pages_num) {
    entry64_t* e = (entry64_t*)m_entry;
    // First pop back old dmap data
-   m_state.pop_back(old_dmap_pages_num * 8);
+   m_state.pop_back(1);
 
    m_dmap_offs = m_state.table_size();
 
