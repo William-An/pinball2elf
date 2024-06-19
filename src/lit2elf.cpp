@@ -152,6 +152,9 @@ static lte_addr_t litelfMarkDynallocPages(lte_memimg_t& memimg, lte_x86_arch_sta
                // Fill placeholder pages
                while (offset/LTE_PAGE_SIZE > 0) {
                   // Use placeholder for this
+                  // TODO Cannot use placeholder page...
+                  // TODO How to create zero-bytes page for wholes?
+                  // TODO Or fix below where the va get pushed to pages
                   pages[pg_prev->va + offset] = pg;
                   offset -= LTE_PAGE_SIZE;
                }
@@ -174,7 +177,8 @@ static lte_addr_t litelfMarkDynallocPages(lte_memimg_t& memimg, lte_x86_arch_sta
    printf("Dumping DYNPages addresses:\n");
    for(std::map<lte_addr_t, lte_mempage_t*>::iterator it = pages.begin(); it != pages.end(); ++it)
    {
-      lte_uint64_t va = it->second->va;
+      // lte_uint64_t va = it->second->va;
+      lte_uint64_t va = it->first;
       dynpages.push_back(&va, va_size);
       printf("\tDYNPages: Addr: %llx\n", va);
    }
