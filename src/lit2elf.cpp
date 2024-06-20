@@ -174,13 +174,13 @@ static lte_addr_t litelfMarkDynallocPages(lte_memimg_t& memimg, lte_x86_arch_sta
    }
 
    size_t va_size = (arch_state.get_arch() == ELFCLASS64) ? sizeof(lte_uint64_t) : sizeof(lte_uint32_t);
-   printf("Dumping DYNPages addresses:\n");
+   // printf("Dumping DYNPages addresses:\n");
    for(std::map<lte_addr_t, lte_mempage_t*>::iterator it = pages.begin(); it != pages.end(); ++it)
    {
       // lte_uint64_t va = it->second->va;
       lte_uint64_t va = it->first;
       dynpages.push_back(&va, va_size);
-      printf("\tDYNPages: Addr: %llx\n", va);
+      // printf("\tDYNPages: Addr: %llx\n", va);
    }
 
    return pages.size() ? pages.begin()->first : LTE_MAXVAL(lte_addr_t);
