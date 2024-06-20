@@ -820,7 +820,7 @@ int main(int argc, char** argv)
          LTE_ERRAX(!entry_va, "no space for entry point code");
 
          // Leave enough space for extra pages created from compaction
-         entry_data_va = img.insert(NULL, 10*(entry->get_data_size()), SHF_DATA|SHF_ENTRYPOINT);
+         entry_data_va = img.insert(NULL, 16*(entry->get_data_size()), SHF_DATA|SHF_ENTRYPOINT);
          LTE_ERRAX(!entry_data_va, "no space for entry point data");
       }
       else
