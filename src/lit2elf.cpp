@@ -815,6 +815,13 @@ int main(int argc, char** argv)
       {
          entry->setup(arch_state.get_threads_num(), &arch_state.get_thread_state(0), dynpages.table_ptr(), dynpages.count());
          entry->enable_modify_ldt(!get_config().no_modify_ldt(arch_state.get_arch()));
+
+         entry_va = img.insert(NULL, entry->get_code_size(), SHF_TEXT|SHF_ENTRYPOINT);
+         LTE_ERRAX(!entry_va, "no space for entry point code");
+
+         // Leave enough space for extra pages created from compaction
+         entry_data_va = img.insert(NULL, 10*(entry->get_data_size()), SHF_DATA|SHF_ENTRYPOINT);
+         LTE_ERRAX(!entry_data_va, "no space for entry point data");
       }
       else
       {
@@ -843,7 +850,7 @@ int main(int argc, char** argv)
     * and .comment sections, the maximal number of sections containing memory
     * image data should be less than (elf->get_max_phnum() - 8)
    */
-   lte_uint64_t regions_num_max = elf->get_max_phnum() - 10;
+   lte_uint64_t regions_num_max = elf->get_max_phnum() - 8;
    lte_uint64_t regions_num = img.compact(regions_num_max);
    printf("main: region num: %lld region max: %lld\n", regions_num, regions_num_max);
 
@@ -858,13 +865,6 @@ int main(int argc, char** argv)
    // Move entry code positioning logic here
    if(!get_config().no_startup_code())
    {
-      entry_va = img.insert(NULL, entry->get_code_size(), SHF_TEXT|SHF_ENTRYPOINT);
-      LTE_ERRAX(!entry_va, "no space for entry point code");
-
-      // Leave enough space for extra pages created from compaction
-      entry_data_va = img.insert(NULL, 2*(entry->get_data_size()), SHF_DATA|SHF_ENTRYPOINT);
-      LTE_ERRAX(!entry_data_va, "no space for entry point data");
-
       entry->relocate_code(entry_va); // should be before copying to image
       entry->relocate_data(entry_data_va); // should be before copying to image
 
