@@ -815,13 +815,6 @@ int main(int argc, char** argv)
       {
          entry->setup(arch_state.get_threads_num(), &arch_state.get_thread_state(0), dynpages.table_ptr(), dynpages.count());
          entry->enable_modify_ldt(!get_config().no_modify_ldt(arch_state.get_arch()));
-
-         entry_va = img.insert(NULL, entry->get_code_size(), SHF_TEXT|SHF_ENTRYPOINT);
-         LTE_ERRAX(!entry_va, "no space for entry point code");
-
-         // Leave enough space for extra pages created from compaction
-         entry_data_va = img.insert(NULL, 2*(entry->get_data_size()), SHF_DATA|SHF_ENTRYPOINT);
-         LTE_ERRAX(!entry_data_va, "no space for entry point data");
       }
       else
       {
@@ -865,6 +858,13 @@ int main(int argc, char** argv)
    // Move entry code positioning logic here
    if(!get_config().no_startup_code())
    {
+      entry_va = img.insert(NULL, entry->get_code_size(), SHF_TEXT|SHF_ENTRYPOINT);
+      LTE_ERRAX(!entry_va, "no space for entry point code");
+
+      // Leave enough space for extra pages created from compaction
+      entry_data_va = img.insert(NULL, 2*(entry->get_data_size()), SHF_DATA|SHF_ENTRYPOINT);
+      LTE_ERRAX(!entry_data_va, "no space for entry point data");
+
       entry->relocate_code(entry_va); // should be before copying to image
       entry->relocate_data(entry_data_va); // should be before copying to image
 
